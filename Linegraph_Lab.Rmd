@@ -1,0 +1,104 @@
+---
+title: "Linegraph Lab"
+author: "Randy Treat"
+date: "2023-02-15"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+# This is the setup chunk
+#  Here you can set global options for the entire document
+
+library(knitr)
+library(ggplot2) # I recommend doing this
+
+# Although you can call functions from a library using the following notation
+#  without loading the entire library.
+knitr::opts_chunk$set(echo = TRUE, 
+                      comment = NA, # Recommended
+                      fig.path = "./figures/",  # Store all figures here in relative path (make the folder first)
+                      fig.align = "center",
+                      fig.width = 7, # default figure width in inches
+                      fig.height = 7, # default figure height in inches
+                      message = FALSE, # Turn off load messages
+                      warning = FALSE # Turn off warnings
+                      )
+
+```
+
+
+```{r include=FALSE}
+# You should not echo this chunk.
+# include=FALSE does more than echo=FALSE, it actually does: echo=FALSE, results='hide', 
+#  message=FALSE, warning=FALSE, and fig.show='hide'
+
+# You should set your working directory at the very beginning of your R Markdown file
+
+# You should type things out properly for your system
+# Easiest Way - Session>Set Working Directory>To Source Files Location
+# THEN, Copy/paste from R Console here 
+
+```
+
+<!-- ---------------------------------------------------------------------------------------------------- -->
+<!-- ---------------- Lab starts below these lines ----------------------------------------- -->
+<!-- ---------------------------------------------------------------------------------------------------- -->
+
+
+
+***
+
+## Line Graphs
+
+Using the housing dataset, we want to see the trends of the house values over time.
+
+Filter only the first Quarter from each year (`Qrtr == 1`) when considering the different years and discard all other rows. Use either the "filter" function (install the dplyr library) or "subset" function from Base R to accomplish this. 
+
+Do all of the following:
+
+i. Have different colored lines for different states.
+
+ii. Make sure the x-axis has ticks starting with 1975 and ending with 2013 with ticks every 5 years in-between.
+
+iii. Make sure the y-axis has ticks for every 100,000 (starting with 100,000 and ending with 800,000) but format it in a dollar amount $XXX,XXX. Use the dollar_format() function from the scales package to accomplish this.  
+
+iv. Change the y-axis label to one that does not have a period between the words.
+
+v. Add an appropriate title.
+
+```{r, echo=TRUE}
+setwd("C:/Users/tomse/OneDrive/Desktop/Data Viz")
+library(dplyr)
+library(scales)
+housing<-read.csv("housing.csv", header=T)
+housing_qrtr <- housing%>%
+                  filter(Qrtr==1)
+ all_states <- ggplot(housing_qrtr) +
+  aes(x = Year, y = Home.Value, colour = State) +
+  geom_line() +
+  scale_color_hue(direction = 1) +
+  theme_minimal()+
+  scale_y_continuous("Home Value", breaks = seq(0, 800000, by=100000),labels=scales::dollar_format())+
+  scale_x_continuous("Year", breaks = seq(1975, 2013, by= 5))+
+   ggtitle("Rising and Falling Home Values")
+ 
+ all_states
+  
+```
+
+Now, color all lines gray except for California. Make California red. Add a nicer theme.
+
+```{r}
+CA_red <- all_states + geom_line(data = housing, aes(group = State), color = "grey") +
+    scale_color_manual(values = c("CA" = "red"))
+
+CA_red
+```
+
+What happened around 2008 that might be relevant to the dip in home prices everywhere? Was California more or less affected during this dip in prices?
+
+_Your Answer_
+Mortgage market crash, recession
